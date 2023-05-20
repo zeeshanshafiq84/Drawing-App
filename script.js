@@ -1,74 +1,25 @@
-const canvas = document.getElementById("canvas")
-const body = document.querySelector('body');
-canvas.height = window.innerHeight
-canvas.width = window.innerWidth
+const canvas = document.querySelector("canvas"),
+ctx = canvas.getContext("2d");
 
-var theColor = '';
-var lineW = 5;
-let prevX = null
-let prevY = null
-let draw = false
+let isDrawing = false;
 
-body.style.backgroundColor = "#FFFFFF";
-var theInput = document.getElementById("favcolor");
-
-theInput.addEventListener("input", function(){
-    theColor = theInput.value;
-    body.style.backgroundColor = theColor;
-}, false);
-
-const ctx = canvas.getContext("2d")
-ctx.lineWidth = lineW;
-
-document.getElementById("ageInputId").oninput = function(){
-    draw = null
-    lineW = document.getElementById("ageInputId").value;
-    document.getElementById("ageOutputId").innerHTML = lineW;
-    ctx.lineWidth = lineW;
-};
-
-let clrs = document.querySelectorAll(".clr")
-clrs = Array.from(clrs)
-clrs.forEach(clr => {
-    clr.addEventListener("click", () => {
-        ctx.strokeStyle = clr.dataset.clr
-    })
-})
-
-let clearBtn = document.querySelector(".clear")
-clearBtn.addEventListener("click", () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-})
-
-let saveBtn = document.querySelector(".save")
-saveBtn.addEventListener("click", () => {
-    let data = canvas.toDataURL("imag/png")
-    let a = document.createElement("a")
-    a.href = data
-    a.download = "sketch.png"
-    a.click()
-})
-
-window.addEventListener("mousedown", (e) => draw = true)
-window.addEventListener("mouseup", (e) => draw = false)
+window.addEventListener("load",() => {
+    // setting canvas width /height... offset width/height returns viewable width/height of an element
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 
 
-window.addEventListener("mousemove", (e) => {
-    if(prevX ==null || prevY == null || !draw){
-        prevX = e.clientX
-        prevY = e.clientY
-        return
+});
 
-    }
+const startDraw = () => {
+    isDrawing = true;
+}
 
-    let currentX = e.clientX
-    let currentY = e.clientY
+const  drawing = (e) => {
+    if(!isDrawing) return; // if isDrawing is false return from here 
+    ctx.lineTo(e.offsetX, e.offsetY); // Creating line according to the mouse pointer 
+    ctx.stroke(); // drawing / filling line with color
+}
 
-    ctx.beginPatch()
-    ctx.moveTo(prevX, prevY)
-    ctx.lineTo(currentX,currentY)
-    ctx.stroke()
-
-    prevX = currentX
-    prevY = currentY
-})
+canvas.addEventListener("mousedown" ,startDraw);
+canvas.addEventListener("mousemove" ,drawing);
